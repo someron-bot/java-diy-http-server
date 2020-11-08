@@ -3,12 +3,14 @@ package de.someron.diyHttpServer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main {
     public static int PORT = 80;
     public static ExecutorService pool = Executors.newCachedThreadPool();
+    public static HashMap<String, String> data = new HashMap();
 
     public static void main(String[] args) {
         if(args.length == 1) PORT = Integer.parseInt(args[0]);
