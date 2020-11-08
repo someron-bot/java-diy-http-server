@@ -3,9 +3,12 @@ package de.someron.diyHttpServer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Main {
     public static int PORT = 80;
+    public static ExecutorService pool = Executors.newCachedThreadPool();
 
     public static void main(String[] args) {
         if(args.length == 1) PORT = Integer.parseInt(args[0]);
@@ -22,8 +25,7 @@ public class Main {
             try {
                 Socket client = server.accept();
                 System.out.println("Connection from " + client.getInetAddress().getHostAddress());
-                client.getOutputStream().write("Hello World".getBytes());
-                client.close();
+                pool.submit(new ClientHandler(client));
             } catch (IOException e) {
                 e.printStackTrace();
             }
