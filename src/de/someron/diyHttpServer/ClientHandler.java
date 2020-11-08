@@ -1,6 +1,7 @@
 package de.someron.diyHttpServer;
 
-import de.someron.diyHttpServer.parsing.HttpRequest;
+import de.someron.diyHttpServer.protocol.HttpRequest;
+import de.someron.diyHttpServer.protocol.HttpResponse;
 
 import java.io.*;
 import java.net.Socket;
@@ -19,11 +20,12 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        try {
-            String req = new String(in.readNBytes(in.available()), StandardCharsets.UTF_8);
-            System.out.println(req);
-            new HttpRequest(req);
-            clientSocket.close();
+        try (clientSocket) {
+            new HttpRequest(new String(in.readNBytes(in.available()), StandardCharsets.UTF_8));
+            HttpResponse res = new HttpResponse();
+            res.setStatus(200, "OK");
+            res.attachBody("text/html", "<h0>Hello World</h0>");
+            out.write(res.toString().getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }

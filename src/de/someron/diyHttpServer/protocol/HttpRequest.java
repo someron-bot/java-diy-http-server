@@ -1,4 +1,4 @@
-package de.someron.diyHttpServer.parsing;
+package de.someron.diyHttpServer.protocol;
 
 import java.util.Arrays;
 import java.util.HashMap;
