@@ -17,6 +17,7 @@ public class HttpResponse {
 
     public void attachBody(String contentType, String body) {
         headers.put("Content-Type", contentType);
+        headers.put("Content-Length", Integer.toUnsignedString(body.length()));
         this.body = body;
     }
 
@@ -26,6 +27,7 @@ public class HttpResponse {
 
     @Override
     public String toString() {
+        headers.put("Server", "somerons-nice-server");
         StringBuilder res = new StringBuilder();
         res.append("HTTP/").append(VERSION).append(" ").append(status).append(" ").append(statusMessage).append("\r\n");
         for(String key : headers.keySet()) {
