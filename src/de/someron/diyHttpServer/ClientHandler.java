@@ -1,5 +1,7 @@
 package de.someron.diyHttpServer;
 
+import de.someron.diyHttpServer.parsing.HttpRequest;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -17,28 +19,8 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-            out.write("Welcome!".getBytes());
-            while(true) {
-                String line = in.readLine().trim();
-                out.write("processing\n".getBytes());
-                String[] args = line.split(" ");
-                switch (args[0].toUpperCase()) {
-                    case "GET" -> out.write((Main.data.get(args[1]) + "\n").getBytes());
-                    case "SET" -> {
-                        Main.data.put(args[1], args[2]);
-                        out.write("done!\n".getBytes());
-                    }
-                    case "CLOSE" -> {
-                        out.write("bye!\n".getBytes());
-                        clientSocket.close();
-                        return;
-                    }
-                    default -> {
-                        out.write("wdym?\n".getBytes());
-                        out.flush();
-                    }
-                }
-            }
+            new HttpRequest(in.readLine());
+            clientSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
