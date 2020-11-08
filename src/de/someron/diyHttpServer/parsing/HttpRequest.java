@@ -31,11 +31,9 @@ public class HttpRequest {
 
     private void parseRequestLine(String raw) {
         String[] args = raw.split(" ");
+        if(args.length != 3) return;
         method = Method.getMethod(args[0].toUpperCase());
         path = args[1];
         version = Float.parseFloat(args[2].replaceAll("HTTP/", ""));
-        System.out.println("Method: " + method.name());
-        System.out.println("Path: " + path);
-        System.out.println("Version: " + version);
     }
 }
