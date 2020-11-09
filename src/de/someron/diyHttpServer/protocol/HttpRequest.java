@@ -10,6 +10,9 @@ public class HttpRequest {
     public float version;
     public HashMap<String, String> headers = new HashMap<>();
 
+    /**
+     * A enum for the Request methods
+     */
     public enum Method {
         GET, HEAD, POST, PUT, DELETE, OPTIONS, UNKNOWN;
 
@@ -31,12 +34,17 @@ public class HttpRequest {
         try {
             parseRequestLine(lines[0]);
             parseHeaders(Arrays.copyOfRange(lines, 1, ((lines.length - 1) <= 0) ? 1 : lines.length - 1));
+            // Adds body if there is one
             if(raw.split("\r\n\r\n").length == 2) body = raw.split("\r\n\r\n")[1];
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Parses the first line of the request
+     * @param raw The first line of the request
+     */
     private void parseRequestLine(String raw) {
         String[] args = raw.split(" ");
         if(args.length != 3) return;
@@ -45,6 +53,10 @@ public class HttpRequest {
         version = Float.parseFloat(args[2].replaceAll("HTTP/", ""));
     }
 
+    /**
+     * Loads the headers into a {@link java.util.HashMap HashMap}
+     * @param raw The header lines
+     */
     private void parseHeaders(String[] raw) {
         for(String line : raw) {
             String[] parts = line.split(": ");
