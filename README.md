@@ -13,3 +13,4 @@ The response in my tests (Postman) were around 7ms.
 - Better (Method) Access control
 - Rate Limits
 - eventually MIME-Types
+- switch to NIO
