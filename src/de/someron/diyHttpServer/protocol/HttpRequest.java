@@ -6,11 +6,12 @@ import java.util.HashMap;
 public class HttpRequest {
     public Method method;
     public String path;
+    public String body;
     public float version;
-    public HashMap<String, String> headers = new HashMap<String, String>();
+    public HashMap<String, String> headers = new HashMap<>();
 
     public enum Method {
-        GET, HEAD, POST, PUT, DELETE, UNKNOWN;
+        GET, HEAD, POST, PUT, DELETE, OPTIONS, UNKNOWN;
 
         public static Method getMethod(String name) {
             switch(name) {
@@ -19,6 +20,7 @@ public class HttpRequest {
                 case "POST" -> { return POST; }
                 case "PUT" -> { return PUT; }
                 case "DELETE" -> { return DELETE; }
+                case "OPTIONS" -> { return OPTIONS; }
                 default -> { return UNKNOWN; }
             }
         }
@@ -29,6 +31,7 @@ public class HttpRequest {
         try {
             parseRequestLine(lines[0]);
             parseHeaders(Arrays.copyOfRange(lines, 1, ((lines.length - 1) <= 0) ? 1 : lines.length - 1));
+            if(raw.split("\r\n\r\n").length == 2) body = raw.split("\r\n\r\n")[1];
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -45,7 +48,9 @@ public class HttpRequest {
     private void parseHeaders(String[] raw) {
         for(String line : raw) {
             String[] parts = line.split(": ");
-            headers.put(parts[0], parts[1]);
+            if(parts.length == 2) {
+                headers.put(parts[0], parts[1]);
+            }
         }
     }
 }

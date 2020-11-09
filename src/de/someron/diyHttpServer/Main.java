@@ -13,13 +13,14 @@ import java.util.concurrent.Executors;
 
 public class Main {
     public static ExecutorService pool = Executors.newCachedThreadPool();
-    public static HashMap<String, String> data = new HashMap();
     public static Properties config = new Properties();
+    public static File webroot;
 
     public static void main(String[] args) {
         try {
             File configuration = new File("./config.properties");
             config.load(new FileInputStream(configuration));
+            webroot = new File(config.getProperty("webroot"));
             listen();
         } catch (IOException e) {
             e.printStackTrace();
