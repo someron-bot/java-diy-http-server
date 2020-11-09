@@ -1,5 +1,5 @@
 # Java DIY HTTP Server
-This project is inspired by [The Programmers Hangout](https://discord.gg/programming).
+This project is inspired by [The Programmers Hangout](https://discord.gg/programming). This was created using [this](https://theprogrammershangout.com/resources/projects/http-project-guide/intro.md) guide.
 
 ## Features
 This is a basic http-server that can handle basic HTTP Methods and
