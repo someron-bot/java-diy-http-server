@@ -13,6 +13,7 @@ public class Main {
     public static ExecutorService pool = Executors.newCachedThreadPool();
     public static Properties config = new Properties();
     public static File webroot;
+    private static ServerSocket server;
 
     /**
      * Preparations for listening
@@ -34,7 +35,15 @@ public class Main {
      * @throws IOException If something goes wrong
      */
     public static void listen() throws IOException {
-        ServerSocket server = new ServerSocket(Integer.parseInt((String) config.get("port")));
+        server = new ServerSocket(Integer.parseInt((String) config.get("port")));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                server.close();
+                System.out.println("Program shut down");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
         while(true) {
             try {
                 Socket client = server.accept(); // Get the socket-Connection to the client
