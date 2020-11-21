@@ -30,6 +30,7 @@ public class ClientHandler implements Runnable {
             HttpResponse res = new HttpResponse();
             Path path = Paths.get((String) Main.config.get("webroot"), req.path);
             File file = path.toFile();
+            if(file.isDirectory()) file = new File(file.getCanonicalPath(), "index.html");
             // Checks if file is inside webroot
             if(!file.getCanonicalPath().startsWith(Main.webroot.getCanonicalPath())) {
                 res.setStatus(404, "Not Found");
@@ -51,6 +52,8 @@ public class ClientHandler implements Runnable {
                     e.printStackTrace();
                 }
             }
+            // Logging
+            System.out.println(clientSocket.getInetAddress().getHostAddress() + ": " + req.method.toString() + " " + req.path + " -> " + res.status + " " + res.statusMessage);
             // Send the actual data
             out.write(res.toString().getBytes());
         } catch (IOException e) {
@@ -87,7 +90,7 @@ public class ClientHandler implements Runnable {
     private void getFile(HttpRequest req, HttpResponse res, File file) throws Exception {
         if(file.exists()) {
             // Read file
-            res.attachBody(new String(new FileInputStream(file).readAllBytes(), StandardCharsets.UTF_8));
+            res.attachBody(null, new String(new FileInputStream(file).readAllBytes(), StandardCharsets.UTF_8));
             // Handle nonexistent files
         } else {
             res.setStatus(404, "Not Found");
