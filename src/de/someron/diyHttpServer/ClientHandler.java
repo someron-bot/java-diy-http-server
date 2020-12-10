@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 
 public class ClientHandler implements Runnable {
     private final Socket clientSocket;
@@ -26,6 +27,7 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try (clientSocket) {
+            long start = System.currentTimeMillis();
             HttpRequest req = new HttpRequest(new String(in.readNBytes(in.available()), StandardCharsets.UTF_8));
             HttpResponse res = new HttpResponse();
             Path path = Paths.get((String) Main.config.get("webroot"), req.path);
@@ -52,12 +54,41 @@ public class ClientHandler implements Runnable {
                     e.printStackTrace();
                 }
             }
-            // Logging
-            System.out.println(clientSocket.getInetAddress().getHostAddress() + ": " + req.method.toString() + " " + req.path + " -> " + res.status + " " + res.statusMessage);
+            long durationMillis = System.currentTimeMillis();
+            if(Boolean.parseBoolean(Main.config.getProperty("sendCalculationTime", "false"))) res.headers.put("Calculation-Time", Long.toString(durationMillis));
             // Send the actual data
             out.write(res.toString().getBytes());
+            // Logging
+            System.out.println(getLogMessage(req, res, durationMillis));
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Logs the request and response into console. Uses morgan logging presets
+     * @param req The Request
+     * @param res The Response
+     * @return The Log line
+     */
+    private String getLogMessage(HttpRequest req, HttpResponse res, long durationMillis) {
+        switch(Main.config.getProperty("logFormat")) {
+            case "combined" -> {
+                return String.format("%s - :remote-user [%tc] \"%s %s HTTP/%f\" %d %d \":referrer\" \"%d",
+                        clientSocket.getInetAddress().getCanonicalHostName(), new Date(), req.method.toString(), req.path, req.version, res.status, res.body.length(), req.headers.get("User-Agent"));
+            }
+            case "common" -> {
+                return String.format("%s - :remote-user [%tc] \"%s %s HTTP/%d\" %d %d",
+                        clientSocket.getInetAddress().getCanonicalHostName(), new Date(), req.method.toString(), req.path, req.version, res.status, res.body.length());
+            }
+            case "short" -> {
+                return String.format("%s :remote-user %s %s HTTP/%f %d %d - %d ms",
+                        clientSocket.getInetAddress().getCanonicalHostName(), req.method.toString(), req.path, req.version, res.status, res.body.length(), durationMillis);
+            }
+            default -> {
+                return String.format("%s %s %d %d - %d ms",
+                        req.method.toString(), req.path, res.status, res.body.length(), durationMillis);
+            }
         }
     }
 
@@ -90,7 +121,7 @@ public class ClientHandler implements Runnable {
     private void getFile(HttpRequest req, HttpResponse res, File file) throws Exception {
         if(file.exists()) {
             // Read file
-            res.attachBody(null, new String(new FileInputStream(file).readAllBytes(), StandardCharsets.UTF_8));
+            res.attachBody(file);
             // Handle nonexistent files
         } else {
             res.setStatus(404, "Not Found");

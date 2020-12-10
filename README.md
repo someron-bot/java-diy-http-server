@@ -9,7 +9,7 @@ The response in my tests (Postman) were around 7ms.
 
 ## TODO
 
-- Automatic Content-Type
+- ~~Automatic Content-Type~~ _(Done)_
 - Better (Method) Access control
 - Rate Limits
-- eventually MIME-Types
+- ~~eventually MIME-Types~~ _(Done)_
